@@ -50,3 +50,29 @@ hello
 ```
 if you check for `target/scala-2.12/classes/`, it won’t exist because clean task has run even though it is inside the `if (false)`
 - also multiple dependencies are not evaluated in any guaranteed order so `update` might run before or after `clean`
+
+## Scope
+- each key can have an associated value in more than one context called a _scope_
+- so for example `compile` key can have different values in different projects
+- but there can only be one value for the key in a single scope
+#### Scope axes
+- a _scope axis_ is a type constructor similar to Option[A] that is used to form a component in a scope
+- there are three scope axes
+  - the subproject axis
+  - the dependency configuration axis
+  - the task axis
+  - a full scope in `sbt` is a __tuple__ of a subproject, configuration, and task i.e.
+  ```
+  scalacOptions in (projA, Compile, console)
+  ```
+  or more precisely
+  ```
+  scalacOptions in (Select(projA: Reference),
+                    Select(Compile: ConfigKey),
+                    Select(console.key))
+  ```
+  - when adding a key to a scope use the `in` operator, and you can add a key to any axis or multiple axes at once
+  ```
+  name in Compile := "hello"
+  name in (Compile, packageBin) := "package-hello"
+  ```
