@@ -3,11 +3,6 @@ import scala.sys.process.Process
 name := "preowned-kittens"
 version := "1.0"
 
-libraryDependencies ++= Seq(
-  "junit" % "junit" % "4.12" % "test",
-  "org.specs2" %% "specs2-core" % "3.9.1" % "test"
-)
-
 scalacOptions in Test ++= Seq("-Yrangepos")
 
 val gitHeadCommitSha = taskKey[String]("Determines the current git commit SHA")
@@ -20,3 +15,25 @@ makeVersionProperties := {
   IO.write(propertiesFile, content)
   Seq(propertiesFile)
 }
+
+lazy val common = (
+  Project("common", file("common"))
+  settings(
+    libraryDependencies ++= Seq(
+      "junit" % "junit" % "4.12" % "test",
+      "org.specs2" %% "specs2-core" % "3.9.1" % "test"
+    )
+  )
+)
+
+lazy val analytics = (
+  Project("analytics", file("analytics"))
+  dependsOn(common)
+  settings()
+)
+
+lazy val website = (
+  Project("website", file("website"))
+  dependsOn(common)
+  settings()
+)
